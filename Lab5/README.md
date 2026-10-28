@@ -1,51 +1,46 @@
-# Lab 5: Static Code Analysis — Radio Station Programme Schedule
+# Lab 5 — Static Code Analysis: Radio Schedule
 
-**Your file:** `radio_schedule.py`
+**Name:** Prahas Bodanapati  **SRN:** PES1UG24CS327  **Section:** 5F
 
-Follow the lab handout for the full instructions.
+Assigned repository: `L5_22_radio_schedule`. File analysed: `radio_schedule.py`, a programme schedule for a radio station (books slots, lists morning shows, checks timing, removes slots).
 
-## About the program
+## Run
 
-A programme schedule for a radio station. It books show slots, lists the morning shows, checks timing and removes slots.
+```
+python radio_schedule.py
+```
 
-The code works, but only just. It has quality, style and security problems of the kind Pylint, Flake8 and Bandit are built to find.
+Expected output:
 
-## What to do
+```
+Sunrise Beats hosted by Vik
+True ['Sunrise Beats']
+```
 
-1. **Run it first** and read the output carefully:
-   ```bash
-   python radio_schedule.py
-   ```
-   It runs a short demonstration and may create a small output file in the current folder, so run it from a folder you don't mind adding files to.
+## Analysis
 
-2. **Install the tools:**
-   ```bash
-   pip install pylint bandit flake8
-   ```
+```
+pip install pylint bandit flake8
+pylint radio_schedule.py > pylint_report.txt
+bandit -r radio_schedule.py > bandit_report.txt
+flake8 radio_schedule.py > flake8_report.txt
+```
 
-3. **Run the analysis** and save the reports:
-   ```bash
-   pylint radio_schedule.py > pylint_report.txt
-   bandit -r radio_schedule.py > bandit_report.txt
-   flake8 radio_schedule.py > flake8_report.txt
-   ```
+| Tool | Before | After |
+|------|--------|-------|
+| Pylint | 2.41/10 | 10.00/10 |
+| Bandit | 3 issues (2 Medium, 1 Low) | No issues |
+| Flake8 | 4 issues | 0 issues (empty report) |
 
-4. **Document the issues** in `issues.md` using this table (at least 4 rows, high and medium severity first):
+## Files
 
-   | Issue | Type | Line(s) | Description | Fix Approach |
-   |-------|------|---------|-------------|--------------|
-   | ... | ... | ... | ... | ... |
+- `radio_schedule.py`: cleaned version
+- `issues.md`: issue table (type, lines, description, fix)
+- `reflection.md`: answers to the reflection questions
+- `reports/before/`, `reports/after/`: Pylint, Bandit and Flake8 reports before and after the fixes
 
-5. **Fix the code.** Fix at least 4 of the issues you documented, then rerun all three tools to confirm they are gone. Repeat until you are satisfied. The program should still do its job when you are done.
+## Commits
 
-6. **Reflect.** Answer the four reflection questions from the handout in `reflection.md`.
-
-## Deliverables
-
-1. `radio_schedule.py`: your cleaned version, with at least 4 issues fixed.
-2. `issues.md`: the completed issue table.
-3. `reflection.md`: your answers to the reflection questions.
-
-**Target:** aim for a Pylint score above 9.5 on your final file. A perfect 10.00/10 is very good.
-
-Be ready to explain the bugs you found and how you fixed them. You may be called on to present.
+1. Fix Bandit issues: parameterised SQL (B608), remove `eval` (B307), password from env (B105)
+2. Fix Flake8 issues: wrap long lines (E501), split one-line `if` (E701)
+3. Fix Pylint issues: snake_case, docstrings, f-strings, remove globals, main guard

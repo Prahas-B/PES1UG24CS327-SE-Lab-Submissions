@@ -4,7 +4,7 @@
 **SRN:** PES1UG24CS327
 **Section:** 5F
 
-This repository contains my Software Engineering lab work. Labs 1-3 build a single system design, the **Hyperlocal Courier Dispatch & Tracking Engine (Problem Statement #23)**, from requirements to Agile backlog to architecture. Lab 4 is a separate hands-on coding lab (a Python sliding puzzle fixed and extended with an LLM).
+This repository contains my Software Engineering lab work. Labs 1-3 build a single system design, the **Hyperlocal Courier Dispatch & Tracking Engine (Problem Statement #23)**, from requirements to Agile backlog to architecture. Lab 4 is a separate hands-on coding lab (a Python sliding puzzle fixed and extended with an LLM). Lab 5 applies static code analysis (Pylint, Bandit, Flake8) to a Python radio-schedule program.
 
 ## Repository Structure
 
@@ -24,15 +24,23 @@ This repository contains my Software Engineering lab work. Labs 1-3 build a sing
 ├── Lab3/   Architecture selection & component modelling
 │   ├── PES1UG24CS327_Architecture_Justification_Lab3.pdf
 │   └── Lab3_Component_Diagram_Clear.pdf
-└── Lab4/   VibeCoding: sliding puzzle (Python)
+├── Lab4/   VibeCoding: sliding puzzle (Python)
+│   ├── README.md
+│   ├── main.py
+│   ├── game.py
+│   ├── puzzle.py
+│   ├── requirements.txt
+│   ├── before_vid.mov
+│   ├── after_vid.mov
+│   └── chathistory_SE_lab4.pdf
+└── Lab5/   Static code analysis: radio schedule (Python)
     ├── README.md
-    ├── main.py
-    ├── game.py
-    ├── puzzle.py
-    ├── requirements.txt
-    ├── before_vid.mov
-    ├── after_vid.mov
-    └── chathistory_SE_lab4.pdf
+    ├── radio_schedule.py
+    ├── issues.md
+    ├── reflection.md
+    └── reports/
+        ├── before/   pylint_report.txt, bandit_report.txt, flake8_report.txt
+        └── after/    pylint_report.txt, bandit_report.txt, flake8_report.txt
 ```
 
 ## Overview
@@ -43,6 +51,7 @@ This repository contains my Software Engineering lab work. Labs 1-3 build a sing
 | 2 | Agile backlog creation and sprint simulation | Jira backlog, story points, sprint board, burndown chart, reflection report |
 | 3 | Architecture selection and component modelling | Architecture justification, UML component diagram |
 | 4 | VibeCoding with an LLM | Fixed and extended sliding puzzle, before/after videos, chat history |
+| 5 | Static code analysis (Pylint, Bandit, Flake8) | Cleaned script, issue table, reflection, before/after reports |
 
 ---
 
@@ -155,3 +164,54 @@ I checked 300 fresh boards for each size (3x3, 4x4, 5x5) with an inversion-parit
 - Gameplay video after changes: `Lab4/after_vid.mov`
 - Updated code: `Lab4/main.py`, `Lab4/game.py`, `Lab4/puzzle.py`
 - Complete LLM chat history: `Lab4/chathistory_SE_lab4.pdf`
+
+* * *
+
+## Lab 5 — Static Code Analysis: Radio Schedule (Python)
+
+The assigned repository (`L5_22_radio_schedule`) contains `radio_schedule.py`, a small programme scheduler for a radio station backed by an in-memory SQLite database. It books show slots, lists morning shows, checks slot timing and removes slots. I analysed it with Pylint, Bandit and Flake8, documented the findings and fixed them, one commit per tool.
+
+### How to Run
+
+Requires Python 3.9+ and no third-party packages.
+
+```
+cd Lab5
+python radio_schedule.py
+```
+
+To re-run the analysis:
+
+```
+pip install pylint bandit flake8
+pylint radio_schedule.py
+bandit -r radio_schedule.py
+flake8 radio_schedule.py
+```
+
+### Results
+
+| Tool | Before | After |
+|------|--------|-------|
+| Pylint | 2.41/10 | **10.00/10** |
+| Bandit | 3 issues (2 Medium, 1 Low) | No issues |
+| Flake8 | 4 issues | 0 issues |
+
+### Key Fixes
+
+1. **Removed `eval` (Bandit B307).** `overlapFree()` evaluated a string expression. It is now `overlap_free(start_hour, minutes, next_start_hour)` and does the comparison with numbers, so the broad `except Exception` it needed is gone too.
+2. **SQL injection (Bandit B608).** The INSERT was built with `%` string formatting, so a show name like `O'Brien Hour` crashed it. It now uses a parameterised query with `?` placeholders.
+3. **Hardcoded password (Bandit B105).** `STUDIO_PASSWORD` is read from an environment variable instead of being committed in source.
+4. **Global state and a stale counter (Pylint W0603).** `booked_minutes` was a global that `removeSlot()` never decreased. It is now computed from the table with `SUM(minutes)`, and the database connection is created in `create_schedule()` and passed to each function.
+5. **Style and quality.** snake_case names, docstrings, f-strings, wrapped long lines, no one-line `if`, and an `if __name__ == "__main__":` guard.
+
+The full issue table is in `Lab5/issues.md` and the reflection answers are in `Lab5/reflection.md`.
+
+### Lab 5 Deliverables
+
+- Cleaned code: `Lab5/radio_schedule.py`
+- Issue table: `Lab5/issues.md`
+- Reflection: `Lab5/reflection.md`
+- Reports before fixes: `Lab5/reports/before/`
+- Reports after fixes: `Lab5/reports/after/`
+- Commits: one each for the Bandit, Flake8 and Pylint fixes (see commit history)
